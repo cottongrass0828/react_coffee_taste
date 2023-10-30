@@ -18,7 +18,7 @@ function Success() {
         <div className="py-14 px-4 md:px-6 2xl:px-20 2xl:container 2xl:mx-auto">
             <div className="flex justify-start item-start space-y-2 flex-col">
                 <h1 className="text-3xl dark:text-white lg:text-4xl font-semibold leading-7 lg:leading-9 text-gray-800">訂單 #{orderData.id?.slice(-6)}</h1>
-                <p className="text-base dark:text-gray-300 font-medium leading-6 text-gray-600">{new Date(orderData.create_at).toLocaleDateString('zh-tw', { year: 'numeric', month: '2-digit', day: '2-digit' })} {new Date(orderData.create_at).toLocaleTimeString('en-US')}</p>
+                <p className="text-base dark:text-gray-300 font-medium leading-6 text-gray-600">{new Date(orderData.create_at).toLocaleDateString('zh-tw', { year: 'numeric', month: '2-digit', day: '2-digit' })} {new Date(orderData.create_at).toLocaleTimeString('it-IT')}</p>
             </div>
             <div className="mt-10 flex flex-col xl:flex-row jusitfy-center items-stretch w-full xl:space-x-8 space-y-4 md:space-y-6 xl:space-y-0">
                 <div className="flex flex-col justify-start items-start w-full space-y-4 md:space-y-6 xl:space-y-8">

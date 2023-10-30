@@ -2,59 +2,62 @@ import { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import axios from 'axios'
 import { MessageContext, handleSuccessMessage } from '../store/messageStore'
-import { PhotoIcon, PlusIcon } from '@heroicons/react/24/outline'
+import { PhotoIcon } from '@heroicons/react/24/outline'
 
-function ProductMoadal({
-    isProductModalActive,
-    closeProductModal,
-    getProducts,
+function ArticleMoadal({
+    isModalActive,
+    closeModal,
+    getArticles,
     currentPage,
     type,
-    tempProduct,
+    tempArticle,
     setIsLoading }) {
-    const [tempData, setTempData] = useState({
-        title: '',
-        category: '',
-        origin_price: 0,
-        price: 0,
-        unit: '',
+
+    const initData = {
+        author: '',
+        create_at: 123455,
         description: '',
+        id: '',
         content: '',
-        is_enabled: 1,
-        imageUrl: '',
-        imagesUrl: []
-    })
+        image: '',
+        isPublic: false,
+        tag: [],
+        title: '',
+        num: 0,
+    }
+
+    const [tempData, setTempData] = useState(initData)
+
     const [modalMessage, setModalMessage] = useState('')
 
     const [, dispatch] = useContext(MessageContext)
 
+
+    const [createDate, setCreateDate] = useState(new Date())
+
     useEffect(() => {
+        setTempData(initData)
         setModalMessage('')
-        if (type === 'create') {
-            setTempData({
-                title: '',
-                category: '',
-                origin_price: 0,
-                price: 0,
-                unit: '',
-                description: '',
-                content: '',
-                is_enabled: 1,
-                imageUrl: '',
-                imagesUrl: []
-            })
-        } else if (type === 'edit') {
-            setTempData(tempProduct)
+        if (type === 'edit') {
+            getArticle(tempArticle.id)
+            setCreateDate(new Date(tempArticle.create_at))
         }
-    }, [type, tempProduct])
+    }, [type, tempArticle])
+
+    const getArticle = async (id) => {
+        setIsLoading(true)
+        const res = await axios.get(`/v2/api/${process.env.REACT_APP_API_PATH}/admin/article/${id}`)
+        setTempData((preData) => ({ ...preData, ...res.data.article }))
+        setIsLoading(false)
+    }
 
     const handleChange = (e) => {
         const { value, name } = e.target;
         let data;
-        if (['price', 'origin_price'].includes(name)) {
-            data = Number(value)
-        } else if (name === 'is_enabled') {
-            data = +e.target.checked
+        if (name === 'tag') {
+            data = value.split(',')
+        } else if (name === 'isPublic') {
+            data = e.target.checked
         } else {
             data = value
         }
@@ -64,16 +67,21 @@ function ProductMoadal({
     const submit = async () => {
         try {
             setIsLoading(true)
-            let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/product`
+            let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/article`
             let method = 'post'
             if (type === 'edit') {
-                api += `/${tempProduct.id}`
+                api += `/${tempArticle.id}`
                 method = 'put'
             }
-            const res = await axios[method](api, { data: tempData })
+            const t_tag = tempData.tag
+            const res = await axios[method](api, {
+                data: {
+                    ...tempData, tag: t_tag.map(s => s.trim()), create_at: new Date().getTime()
+                }
+            })
             handleSuccessMessage(dispatch, res)
-            getProducts(currentPage)
-            closeProductModal()
+            getArticles(currentPage)
+            closeModal()
         } catch (error) {
             console.log(error);
             setModalMessage(Array.isArray(error?.response?.data?.message) ? error?.response?.data?.message.join('，') : error?.response?.data?.message)
@@ -82,7 +90,7 @@ function ProductMoadal({
     }
     const cancelButtonRef = useRef(null)
     return (
-        <Transition.Root show={isProductModalActive} as={Fragment}>
+        <Transition.Root show={isModalActive} as={Fragment}>
             <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
                 <Transition.Child
                     as={Fragment}
@@ -111,7 +119,7 @@ function ProductMoadal({
                                 <form>
                                     <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                         <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-gray-900">
-                                            {type === 'create' ? '建立新商品' : `編輯 ${tempData.title}`}
+                                            {type === 'create' ? '建立新文章' : `編輯 ${tempData.title}`}
                                         </Dialog.Title>
                                         <div className={`mt-5 sm:mt-4 w-full rounded-lg overflow-hidden bg-red-100 mb-2 ${modalMessage ? 'block' : 'hidden'}`}>
                                             <div className="p-4">
@@ -122,24 +130,15 @@ function ProductMoadal({
                                             <div className="mt-5 sm:mt-4 sm:mr-2">
                                                 <div className="border rounded-lg border-gray-900/10 p-2 pb-5">
                                                     <p className="text-base font-semibold leading-7 text-gray-900">圖片</p>
-                                                    <label htmlFor="imageUrl" className="mt-6 block text-sm font-medium leading-6 text-gray-900">
-                                                        圖片網址
+                                                    {tempData.image === '' ? <PhotoIcon className="text-gray-400 w-1/2 mx-auto" /> : <img src={tempData.image} alt='圖片網址' className='block rounded-md mx-auto h-[200px]' />}
+                                                    <label htmlFor="image" className="mt-6 block text-sm font-medium leading-6 text-gray-900">
+                                                        文章圖片連結
                                                     </label>
-                                                    {tempData.imageUrl === '' ? <PhotoIcon className="text-gray-400 w-1/2 mx-auto" /> : <img src={tempData.imageUrl} alt='主圖片網址' className='block rounded-md mx-auto h-[200px]' />}
                                                     <div className="mt-2">
                                                         <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                                                            <input type="text" onChange={handleChange} value={tempData.imageUrl} name="imageUrl" id="imageUrl" placeholder="請輸入圖片連結" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" />
+                                                            <input type="text" onChange={handleChange} value={tempData.image} name="image" id="image" placeholder="請輸入圖片連結" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" />
                                                         </div>
                                                     </div>
-                                                    {/* <label htmlFor="image" className="mt-6 block text-sm font-medium leading-6 text-gray-900">
-                                                        副圖片網址
-                                                    </label>
-                                                    <div className="mt-2">
-                                                        <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                                                            <img src="" alt='' className='rounded-l h-12 w-12 ' /><input type="text" name="image" id="image" placeholder="請輸入圖片連結" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" />
-                                                        </div>
-                                                        <button type='button' className='mt-2 w-full border border-coffee-400 rounded hover:bg-coffee-100'><PlusIcon className="text-coffee-400 w-6 h-6 mx-auto" /></button>
-                                                    </div> */}
                                                 </div>
                                                 <div className="mt-2 sm:mt-1 border rounded-lg border-gray-900/10 p-2 pb-5">
                                                     <fieldset>
@@ -148,52 +147,37 @@ function ProductMoadal({
                                                             <div className="relative flex gap-x-3">
                                                                 <div className="flex h-6 items-center">
                                                                     <input
-                                                                        onChange={handleChange} checked={!!tempData.is_enabled}
-                                                                        id="is_enabled"
-                                                                        name="is_enabled"
+                                                                        onChange={handleChange} checked={tempData.isPublic}
+                                                                        id="isPublic"
+                                                                        name="isPublic"
                                                                         type="checkbox"
                                                                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-coffee-600 accent-coffee-600"
                                                                     />
                                                                 </div>
                                                                 <div className="text-sm leading-6">
-                                                                    <label htmlFor="is_enabled" className="font-medium text-gray-900">
-                                                                        是否啟用
+                                                                    <label htmlFor="isPublic" className="font-medium text-gray-900">
+                                                                        是否發佈
                                                                     </label>
-                                                                    <p className="text-gray-500">打勾即為啟用。</p>
+                                                                    <p className="text-gray-500">打勾即為發佈。</p>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </fieldset>
                                                 </div>
                                                 <div className="mt-2 sm:mt-1 border rounded-lg border-gray-900/10 p-2 pb-5">
-                                                    <p className="text-base font-semibold leading-7 text-gray-900">商品細節</p>
+                                                    <p className="text-base font-semibold leading-7 text-gray-900">文章分類</p>
                                                     <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
-                                                        <div className="sm:col-span-3">
-                                                            <label htmlFor="category" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                分類
+                                                        <div className="sm:col-span-6">
+                                                            <label htmlFor="tag" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                標籤
                                                             </label>
                                                             <div className="mt-2">
                                                                 <input
-                                                                    onChange={handleChange} value={tempData.category}
+                                                                    onChange={handleChange} value={tempData?.tag.toString()}
                                                                     type="text"
-                                                                    name="category"
-                                                                    id="category"
-                                                                    placeholder='請輸入分類'
-                                                                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="sm:col-span-3">
-                                                            <label htmlFor="unit" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                單位
-                                                            </label>
-                                                            <div className="mt-2">
-                                                                <input
-                                                                    onChange={handleChange} value={tempData.unit}
-                                                                    type="text"
-                                                                    name="unit"
-                                                                    id="unit"
-                                                                    placeholder='請輸入單位'
+                                                                    name="tag"
+                                                                    id="tag"
+                                                                    placeholder='請輸入標籤，多個標籤可用半形逗號(,)區隔'
                                                                     className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6"
                                                                 />
                                                             </div>
@@ -203,73 +187,68 @@ function ProductMoadal({
                                             </div>
                                             <div className="grow mt-5 sm:mt-4 sm:ml-2">
                                                 <div className="border rounded-lg border-gray-900/10 p-2 pb-5">
-                                                    <p className="text-base font-semibold leading-7 text-gray-900">商品內容</p>
+                                                    <p className="text-base font-semibold leading-7 text-gray-900">文章內容</p>
                                                     <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
                                                         <div className="sm:col-span-6">
                                                             <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                商品名稱
+                                                                標題
                                                             </label>
                                                             <div className="mt-2">
-                                                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                                                                    <input onChange={handleChange} value={tempData.title} type="text" name="title" id="title" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="請輸入商品名稱" />
-                                                                </div>
+                                                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                                                    <input onChange={handleChange} value={tempData.title} type="text" name="title" id="title" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="請輸入文章標題" />                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div className="col-span-full">
+                                                        <div className="sm:col-span-6">
                                                             <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                產品描述
+                                                                描述
                                                             </label>
                                                             <div className="mt-2">
-                                                                <textarea
-                                                                    onChange={handleChange} defaultValue={tempData.description}
-                                                                    id="description" name="description" rows={3} className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6" />
+                                                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                                                    <input onChange={handleChange} value={tempData.description} type="text" name="description" id="description" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="請輸入文章描述" />                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div className="col-span-full">
                                                             <label htmlFor="content" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                說明內容
+                                                                內文
                                                             </label>
                                                             <div className="mt-2">
                                                                 <textarea
                                                                     onChange={handleChange} defaultValue={tempData.content}
-                                                                    id="content" name="content" rows={3} className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6" />
+                                                                    id="content" name="content" rows={3}
+                                                                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6" />
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div className="mt-2 sm:mt-1 border rounded-lg border-gray-900/10 p-2 pb-5">
-                                                    <p className="text-base font-semibold leading-7 text-gray-900">價格</p>
+                                                    <p className="text-base font-semibold leading-7 text-gray-900">建立資訊</p>
                                                     <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
                                                         <div className="sm:col-span-3">
-                                                            <label htmlFor="origin_price" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                原價
+                                                            <label htmlFor="author" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                作者
                                                             </label>
                                                             <div className="mt-2">
                                                                 <input
-                                                                    onChange={handleChange} value={tempData.origin_price}
-                                                                    type="number"
-                                                                    name="origin_price"
-                                                                    id="origin_price"
-                                                                    placeholder='請輸入原價'
+                                                                    onChange={handleChange} value={tempData.author}
+                                                                    type="text"
+                                                                    name="author"
+                                                                    id="author"
+                                                                    placeholder='請輸入作者'
                                                                     className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6"
                                                                 />
                                                             </div>
                                                         </div>
-                                                        <div className="sm:col-span-3">
-                                                            <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                售價
-                                                            </label>
-                                                            <div className="mt-2">
-                                                                <input
-                                                                    onChange={handleChange} value={tempData.price}
-                                                                    type="number"
-                                                                    name="price"
-                                                                    id="price"
-                                                                    placeholder='請輸入售價'
-                                                                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6"
-                                                                />
+                                                        {type === 'edit' &&
+                                                            <div className="sm:col-span-3">
+                                                                <label htmlFor="create_at"
+                                                                    className="block text-sm font-medium leading-6 text-gray-900">
+                                                                    上次更新時間
+                                                                </label>
+                                                                <div className="mt-2">
+                                                                    <small>{`${createDate.getFullYear().toString()}-${(createDate.getMonth() + 1).toString().padStart(2, 0)}-${createDate.getDate().toString().padStart(2, 0)}`}  {createDate.toLocaleTimeString('it-IT')}</small>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
@@ -288,7 +267,7 @@ function ProductMoadal({
                                             className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                             onClick={() => {
                                                 setModalMessage('')
-                                                closeProductModal()
+                                                closeModal()
                                             }}
                                             ref={cancelButtonRef}
                                         >
@@ -304,4 +283,4 @@ function ProductMoadal({
         </Transition.Root>
     )
 }
-export default ProductMoadal
+export default ArticleMoadal

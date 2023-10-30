@@ -1,6 +1,5 @@
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
+import { Disclosure} from '@headlessui/react'
+import { Bars3Icon, XMarkIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
 import { NavLink } from 'react-router-dom'
 function Navbar({ cartData, setIsShopingCartActive }) {
     function classNames(...classes) {

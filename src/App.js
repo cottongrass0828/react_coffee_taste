@@ -10,6 +10,7 @@ import Products from './pages/front/Products';
 import ProductDetail from './pages/front/ProductDetail';
 import Checkout from './pages/front/Checkout'
 import Success from './pages/front/Success';
+import AdminArticles from './pages/admin/AdminArticles';
 
 function App() {
   return (
@@ -25,7 +26,8 @@ function App() {
         <Route path='/login' element={<Login />} ></Route>
         <Route path='/admin' element={<Dashboard />} >
           <Route path='products' element={<AdminProducts />} ></Route>
-          <Route path='coupons' element={<AdminCoupons />} ></Route>
+          <Route path='articles' element={<AdminArticles />} ></Route>
+          {/* <Route path='coupons' element={<AdminCoupons />} ></Route> */}
           <Route path='orders' element={<AdminOrders />} ></Route>
         </Route>
       </Routes>

@@ -3,39 +3,44 @@ import { Dialog, Transition } from '@headlessui/react'
 import axios from 'axios'
 import { MessageContext, handleSuccessMessage, handleErrorMessage } from '../store/messageStore'
 
-function OrderModal({ isModalActive, closeModal, getOrders, type, tempOrder }) {
+function OrderModal({
+    isModalActive,
+    closeModal,
+    getOrders,
+    tempOrder,
+    setIsLoading }) {
     const [tempData, setTempData] = useState({
-        title: '',
-        is_enabled: 1,
-        percent: 80,
-        due_date: 1555459200,
-        code: '80off'
+        create_at: 1555459200,
+        id: '',
+        is_paid: false,
+        message: '',
+        products: {},
+        user: {},
     })
 
     const [, dispatch] = useContext(MessageContext)
+    const [modalMessage, setModalMessage] = useState('')
 
-    const [date, setDate] = useState(new Date())
+    const [createDate, setCreateDate] = useState(new Date())
     useEffect(() => {
-        if (type === 'create') {
-            setTempData({
-                title: '',
-                is_enabled: 1,
-                percent: 80,
-                due_date: 1555459200,
-                code: '80off'
-            })
-            setDate(new Date())
-        } else if (type === 'edit') {
-            setTempData(tempOrder)
-            setDate(new Date(tempOrder.due_date))
-        }
-    }, [type, tempOrder])
+        setModalMessage('')
+        setTempData({
+            create_at: 1555459200,
+            id: '',
+            is_paid: false,
+            message: '',
+            products: {},
+            user: {}
+        })
+        setTempData(tempOrder)
+        setCreateDate(new Date(tempOrder.create_at))
+    }, [tempOrder])
 
     const handleChange = (e) => {
         const { value, name } = e.target;
         let data;
-        if (name === 'is_enabled') {
-            data = +e.target.checked
+        if (name === 'is_paid') {
+            data = !!value
         } else {
             data = value
         }
@@ -44,22 +49,21 @@ function OrderModal({ isModalActive, closeModal, getOrders, type, tempOrder }) {
 
     const submit = async () => {
         try {
-            let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/order`
-            let method = 'post'
-            if (type === 'edit') {
-                api += `/${tempOrder.id}`
-                method = 'put'
-            }
+            setIsLoading(true)
+            let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/order/${tempOrder.id}`
+            let method = 'put'
+            // let api = `/v2/api/${process.env.REACT_APP_API_PATH}/admin/orders/all`
+            // let method = 'delete'
             const res = await axios[method](api, {
-                data: {
-                    ...tempData, due_date: date.getTime()
-                }
+                data: tempData
             })
             handleSuccessMessage(dispatch, res)
             getOrders()
             closeModal()
         } catch (error) {
             console.log(error);
+            setModalMessage(Array.isArray(error?.response?.data?.message) ? error?.response?.data?.message.join('，') : error?.response?.data?.message)
+            setIsLoading(false)
         }
     }
 
@@ -90,86 +94,136 @@ function OrderModal({ isModalActive, closeModal, getOrders, type, tempOrder }) {
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-xl">
+                            <Dialog.Panel className="relative transform overflow-hidden rounded bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
                                 <form>
                                     <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                         <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-gray-900">
-                                            {type === 'create' ? '建立新優惠券' : `編輯 ${tempData.title}`}
+                                            編輯 {tempData.id}
                                         </Dialog.Title>
+                                        <div className={`mt-5 sm:mt-4 w-full rounded-lg overflow-hidden bg-red-100 mb-2 ${modalMessage ? 'block' : 'hidden'}`}>
+                                            <div className="p-4">
+                                                <p className="text-red-400">儲存失敗：{modalMessage}</p>
+                                            </div>
+                                        </div>
                                         <div className="sm:flex sm:items-start">
+                                            <div className="mt-5 sm:mt-4 sm:mr-2">
+                                                <div className="p-2 pb-5">
+                                                    <p className="text-base font-semibold leading-7 text-gray-900">買家資訊</p>
+                                                    <div className="mt-6 block text-sm font-medium leading-6 text-gray-900">
+                                                        <span className="border border-gray-500 rounded px-2 py-1">收件人</span>
+                                                    </div>
+                                                    <p className="mt-2 sm:max-w-md">{tempData.user?.name}</p>
+                                                    <div className="mt-6 block text-sm font-medium leading-6 text-gray-900">
+                                                        <span className="border border-gray-500 rounded px-2 py-1">Email</span>
+                                                    </div>
+                                                    <p className="mt-2 sm:max-w-md">{tempData.user?.email}</p>
+                                                    <div className="mt-6 block text-sm font-medium leading-6 text-gray-900">
+                                                        <span className="border border-gray-500 rounded px-2 py-1">聯絡電話</span>
+                                                    </div>
+                                                    <p className="mt-2 sm:max-w-md">{tempData.user?.tel}</p>
+                                                    <div className="mt-6 block text-sm font-medium leading-6 text-gray-900">
+                                                        <span className="border border-gray-500 rounded px-2 py-1">收件地址</span>
+                                                    </div>
+                                                    <p className="mt-2 sm:max-w-md">{tempData.user?.address}</p>
+                                                </div>
+                                            </div>
                                             <div className="grow mt-5 sm:mt-4 sm:ml-2">
-                                                <div className="border rounded-lg border-gray-900/10 p-2 pb-5">
-                                                    <p className="text-base font-semibold leading-7 text-gray-900">優惠券內容</p>
+                                                <div className="p-2 pb-5">
+                                                    <p className="text-base font-semibold leading-7 text-gray-900">訂單內容</p>
                                                     <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
-                                                        <div className="sm:col-span-3">
-                                                            <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                標題
-                                                            </label>
-                                                            <div className="mt-2">
-                                                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                                                    <input onChange={handleChange} value={tempData.title} type="text" name="title" id="title" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="請輸入優惠券標題" />
-                                                                </div>
+                                                        <div className="sm:col-span-6">
+                                                            <div className="table__wrapper min-w-[295px]">
+                                                                <table className="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="row">商品名稱</th>
+                                                                            <th scope="col">單位</th>
+                                                                            <th scope="col">數量</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {(Object.values(tempData.products || {})).map((item) => {
+                                                                            return (
+                                                                                <tr key={item.id}>
+                                                                                    <th scope="row" className="font-normal">{item.product.title}</th>
+                                                                                    <td data-header="單位"><div>{item.product.unit}</div></td>
+                                                                                    <td data-header="數量"><div>{item.qty}</div></td>
+                                                                                </tr>
+                                                                            )
+                                                                        })}
+                                                                        <tr>
+                                                                            <td colSpan={3} className='text-right'>總金額 NT${tempData.total}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
                                                             </div>
                                                         </div>
-                                                        <div className="sm:col-span-3">
-                                                            <label htmlFor="code" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                優惠碼
-                                                            </label>
+                                                        <div className="sm:col-span-6">
+                                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                                <span className="border border-gray-500 rounded px-2 py-1">買家留言</span>
+                                                            </div>
                                                             <div className="mt-2">
-                                                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                                                    <input onChange={handleChange} value={tempData.code} type="text" name="code" id="code" className="block flex-1 border-0 bg-transparent py-1.5 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6" placeholder="請輸入優惠碼" />
-                                                                </div>
+                                                                <p>{tempData?.message !== undefined ? tempData.message : <small>(無留言)</small>}</p>
                                                             </div>
                                                         </div>
-                                                        <div className="sm:col-span-3">
-                                                            <label htmlFor="percent" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                折扣 (%)
-                                                            </label>
+                                                        <div className="sm:col-span-6">
+                                                            <div className="block text-sm font-medium leading-6 text-gray-900">
+                                                                <span className="border border-gray-500 rounded px-2 py-1">建立時間</span>
+                                                            </div>
                                                             <div className="mt-2">
-                                                                <input
-                                                                    onChange={handleChange} value={tempData.percent}
-                                                                    type="number"
-                                                                    name="percent"
-                                                                    id="percent"
-                                                                    placeholder='請輸入扣 (%)'
-                                                                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6"
-                                                                />
+                                                                <p>{`${createDate.getFullYear().toString()}-${(createDate.getMonth() + 1).toString().padStart(2, 0)}-${createDate.getDate().toString().padStart(2, 0)}`}  {createDate.toLocaleTimeString('it-IT')}</p>
                                                             </div>
                                                         </div>
-                                                        <div className="sm:col-span-3">
-                                                            <label htmlFor="due_date" className="block text-sm font-medium leading-6 text-gray-900">
-                                                                到期日
+                                                    </div>
+                                                </div>
+                                                <div className="mt-2 sm:mt-1 border rounded-lg border-gray-900/10 p-2 pb-5">
+                                                    <p className="text-base font-semibold leading-7 text-gray-900">訂單狀態</p>
+                                                    <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+                                                        <div className="col-span-full">
+                                                            <label htmlFor="is_paid" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                付款狀態
                                                             </label>
                                                             <div className="mt-2">
-                                                                <input
-                                                                    onChange={(e) => {
-                                                                        setDate(new Date(e.target.value))
-                                                                    }}
-                                                                    value={`${date.getFullYear().toString()}-${(date.getMonth() + 1).toString().padStart(2, 0)}-${date.getDate().toString().padStart(2, 0)}`}
-                                                                    type="date"
-                                                                    name="due_date"
-                                                                    id="due_date"
-                                                                    className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6"
-                                                                />
+                                                                <select
+                                                                    value={tempData.is_paid}
+                                                                    onChange={handleChange}
+                                                                    id="is_paid"
+                                                                    name="is_paid"
+                                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                >
+                                                                    <option value={true}>已付款</option>
+                                                                    <option value={false}>尚未付款</option>
+                                                                </select>
                                                             </div>
                                                         </div>
                                                         <div className="col-span-full">
-                                                            <div className="relative flex gap-x-3">
-                                                                <div className="flex h-6 items-center">
-                                                                    <input
-                                                                        onChange={handleChange} checked={!!tempData.is_enabled}
-                                                                        id="is_enabled"
-                                                                        name="is_enabled"
-                                                                        type="checkbox"
-                                                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-coffee-600 accent-coffee-600"
-                                                                    />
-                                                                </div>
-                                                                <div className="text-sm leading-6">
-                                                                    <label htmlFor="is_enabled" className="font-medium text-gray-900">
-                                                                        是否啟用
-                                                                    </label>
-                                                                    <p className="text-gray-500">打勾即為啟用。</p>
-                                                                </div>
+                                                            <label htmlFor="deliver_status" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                外送狀態
+                                                            </label>
+                                                            <div className="mt-2">
+                                                                <select
+                                                                    value={tempData?.deliver_status === undefined ? 0 : tempData.deliver_status}
+                                                                    onChange={handleChange}
+                                                                    id="deliver_status"
+                                                                    name="deliver_status"
+                                                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                                                >
+                                                                    <option value={0}>未確認</option>
+                                                                    <option value={1}>已確認</option>
+                                                                    <option value={2}>外送中</option>
+                                                                    <option value={3}>已送達</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-span-full">
+                                                            <label htmlFor="comment" className="block text-sm font-medium leading-6 text-gray-900">
+                                                                訂單備註
+                                                            </label>
+                                                            <div className="mt-2">
+                                                                <textarea
+                                                                    onChange={handleChange} defaultValue={tempData.comment}
+                                                                    id="comment" name="comment" rows={3}
+                                                                    className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-coffee-600 sm:text-sm sm:leading-6" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -179,16 +233,19 @@ function OrderModal({ isModalActive, closeModal, getOrders, type, tempOrder }) {
                                     </div>
                                     <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                         <button
+                                            onClick={submit}
                                             type="button"
                                             className="inline-flex w-full justify-center rounded-md bg-coffee-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-coffee-500 sm:ml-3 sm:w-auto"
-                                            onClick={submit}
                                         >
                                             儲存
                                         </button>
                                         <button
                                             type="button"
                                             className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                                            onClick={closeModal}
+                                            onClick={() => {
+                                                setModalMessage('')
+                                                closeModal()
+                                            }}
                                             ref={cancelButtonRef}
                                         >
                                             取消
@@ -200,7 +257,7 @@ function OrderModal({ isModalActive, closeModal, getOrders, type, tempOrder }) {
                     </div>
                 </div>
             </Dialog>
-        </Transition.Root>
+        </Transition.Root >
     )
 }
 export default OrderModal
