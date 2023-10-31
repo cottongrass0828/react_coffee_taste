@@ -2,7 +2,7 @@
 import { ChevronLeftIcon } from '@heroicons/react/24/outline'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form"
-import Input from '../../components/FormElement'
+import Input from '../components/FormElement'
 import axios from 'axios'
 function Checkout() {
     const navigate = useNavigate();
@@ -34,7 +34,7 @@ function Checkout() {
             <div className="flex justify-center items-center h-16 bg-coffee-800">
                 <img
                     className="h-8 w-auto rounded-lg"
-                    src="/logo200.png"
+                    src="logo200.png"
                     alt="logo"
                 />
             </div>

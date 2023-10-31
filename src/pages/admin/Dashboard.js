@@ -65,7 +65,7 @@ function Dashboard() {
                                             <NavLink to='/'>
                                                 <img
                                                     className="h-8 w-auto rounded-lg"
-                                                    src="/logo200.png"
+                                                    src="logo200.png"
                                                     alt="logo"
                                                 />
                                             </NavLink>
@@ -125,7 +125,7 @@ function Dashboard() {
                     <Loading isLoading={isLoading} />
                     <Message />
                     <nav className="hidden sm:block h-full min-w-[290px] bg-white px-[26px] py-6 border-r border-r-[#EFF0F1]">
-                        <div className="inline-block w-[45px] ml-[2px] mr-3.5"><img className="object-cover rounded-lg" src="/logo200.png" alt="logo" /></div>
+                        <div className="inline-block w-[45px] ml-[2px] mr-3.5"><img className="object-cover rounded-lg" src="logo200.png" alt="logo" /></div>
                         <div className="inline-block mb-[52px]">
                             <div className="font-bold text-xl">咖啡味</div>
                             <div>後臺管理</div>

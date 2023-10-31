@@ -27,7 +27,7 @@ function ShoppingCart({ cartData, isShopingCartActive, setIsShopingCartActive, g
         try {
             const res = await axios.put(`/v2/api/${process.env.REACT_APP_API_PATH}/cart/${item.id}`, data)
             getCart()
-            setLoadingItems(loadingItems.filter((obj) => { obj !== item.id }))
+            setLoadingItems(loadingItems.filter((obj) => obj !== item.id))
         } catch (error) {
             console.log(error);
         }

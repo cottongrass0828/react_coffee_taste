@@ -28,7 +28,7 @@ function Navbar({ cartData, setIsShopingCartActive }) {
                                     <NavLink to='/'>
                                         <img
                                             className="h-8 w-auto rounded-lg"
-                                            src="/logo200.png"
+                                            src="logo200.png"
                                             alt="logo"
                                         />
                                     </NavLink>

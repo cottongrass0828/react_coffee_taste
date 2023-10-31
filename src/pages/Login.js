@@ -19,8 +19,20 @@ function Login() {
 
     const submit = async () => {
         try {
+            if (data.username !== 'customer' || data.password !== 'test1234') {
+                throw ({
+                    response: {
+                        data: {
+                            message: '登入帳密錯誤'
+                        }
+                    }
+                })
+            }
             setIsLoading(true)
-            const res = await axios.post(`/v2/admin/signin`, data)
+            const res = await axios.post(`/v2/admin/signin`, {
+                username: 'inoriro.ame@gmail.com',
+                password: 'hexttest231031'
+            })
             const { token, expired } = res.data
             if (res.data.success) {
                 navigate('/admin/products')
@@ -37,7 +49,7 @@ function Login() {
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
             <Loading isLoading={isLoading} />
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img className="mx-auto h-28 w-auto rounded-lg" src="/logo200.png" alt="Coffee Taste" />
+                <img className="mx-auto h-28 w-auto rounded-lg" src="logo200.png" alt="Coffee Taste" />
                 <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">管理員登入</h2>
             </div>
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
