@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/react_coffee_taste/static/css/main.0f4f2afc.css",
+    "main.js": "/react_coffee_taste/static/js/main.7eb1a990.js",
+    "static/js/787.d5768953.chunk.js": "/react_coffee_taste/static/js/787.d5768953.chunk.js",
+    "index.html": "/react_coffee_taste/index.html",
+    "main.0f4f2afc.css.map": "/react_coffee_taste/static/css/main.0f4f2afc.css.map",
+    "main.7eb1a990.js.map": "/react_coffee_taste/static/js/main.7eb1a990.js.map",
+    "787.d5768953.chunk.js.map": "/react_coffee_taste/static/js/787.d5768953.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0f4f2afc.css",
+    "static/js/main.7eb1a990.js"
+  ]
+}
