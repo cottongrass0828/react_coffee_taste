@@ -23,14 +23,14 @@ function FrontLayout() {
     }, [])
 
     return (
-        <div className="flex flex-col" >
+        <div className="flex flex-col h-full" >
             <ShopingCart
                 cartData={cartData}
                 isShopingCartActive={isShopingCartActive}
                 setIsShopingCartActive={setIsShopingCartActive}
                 getCart={getCart} />
             <Navbar cartData={cartData} setIsShopingCartActive={setIsShopingCartActive} />
-            <div className="">
+            <div className="grow">
                 <Outlet context={{ getCart }}></Outlet>
             </div>
             <Footer />

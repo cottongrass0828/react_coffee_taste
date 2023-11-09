@@ -1,101 +1,48 @@
+import { FaGithub } from "react-icons/fa";
+import { Link } from "react-router-dom";
 function Footer() {
-    return (<footer className="footer-1 bg-gray-100 py-8 sm:py-12">
-        <div className="container mx-auto px-4">
-            <div className="sm:flex sm:flex-wrap sm:-mx-4 md:py-4">
-                <div className="px-4 sm:w-1/2 md:w-1/4 xl:w-1/6">
-                    <h5 className="text-xl font-bold mb-6">Features</h5>
-                    <ul className="list-none footer-links">
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Cool stuff</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Random feature</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Team feature</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Stuff for developers</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Another one</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Last time</a>
-                        </li>
-                    </ul>
+    return (
+        <footer className="w-full border-t border-gray-100 bg-coffee-100 pt-8 sm:pt-12">
+            <div className="container mx-auto px-4 sm:flex sm:justify-between">
+                <div className="sm:grow sm:flex sm:flex-wrap sm:-mx-4 md:py-4">
+                    <div className="px-4 sm:w-1/2 md:w-1/4 xl:w-1/6">
+                        <ul className="list-none">
+                            <li className="mb-2">
+                                <Link to='/' className="border-b border-solid border-transparent hover:border-coffee-800 hover:text-coffee-800">首頁</Link>
+                            </li>
+                            <li className="mb-2">
+                                <Link to='/products' className="border-b border-solid border-transparent hover:border-coffee-800 hover:text-coffee-800">所有商品</Link>
+                            </li>
+                            <li className="mb-2">
+                                <Link to='/articles' className="border-b border-solid border-transparent hover:border-coffee-800 hover:text-coffee-800">咖啡駐所</Link>
+                            </li>
+                            <li className="mb-2">
+                                <Link to='/about' className="border-b border-solid border-transparent hover:border-coffee-800 hover:text-coffee-800">咖啡味故事</Link>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <div className="px-4 sm:w-1/2 md:w-1/4 xl:w-1/6 mt-8 sm:mt-0">
-                    <h5 className="text-xl font-bold mb-6">Resources</h5>
-                    <ul className="list-none footer-links">
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Resource</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Resource name</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Another resource</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Final resource</a>
-                        </li>
-                    </ul>
-                </div>
-                <div className="px-4 sm:w-1/2 md:w-1/4 xl:w-1/6 mt-8 md:mt-0">
-                    <h5 className="text-xl font-bold mb-6">About</h5>
-                    <ul className="list-none footer-links">
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Team</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Locations</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Privacy</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Terms</a>
-                        </li>
-                    </ul>
-                </div>
-                <div className="px-4 sm:w-1/2 md:w-1/4 xl:w-1/6 mt-8 md:mt-0">
-                    <h5 className="text-xl font-bold mb-6">Help</h5>
-                    <ul className="list-none footer-links">
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Support</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Help Center</a>
-                        </li>
-                        <li className="mb-2">
-                            <a href="#" className="border-b border-solid border-transparent hover:border-purple-800 hover:text-purple-800">Contact Us</a>
-                        </li>
-                    </ul>
+                <div className="shrink px-4 mt-8 ">
+                    <div className="inline-block w-[45px] mr-3.5">
+                        <img className="object-cover rounded-lg" src="react_coffee_taste/logo200.png" alt="logo" />
+                    </div>
+                    <div className="inline-block mb-[52px]">
+                        <div className="font-bold text-xl tracking-[0.85em]">咖啡味</div>
+                        <div className="text-sm">COFFEE TASTE</div>
+                    </div>
                 </div>
             </div>
-
-            <div className="sm:flex sm:flex-wrap sm:-mx-4 mt-6 pt-6 sm:mt-12 sm:pt-12 border-t">
-                <div className="sm:w-full px-4 md:w-1/6">
-                    <strong>FWR</strong>
-                </div>
-                <div className="px-4 sm:w-1/2 md:w-1/4 mt-4 md:mt-0">
-                    <h6 className="font-bold mb-2">Address</h6>
-                    <address className="not-italic mb-4 text-sm">
-                        123 6th St.<br />
-                        Melbourne, FL 32904
-                    </address>
-                </div>
-                <div className="px-4 sm:w-1/2 md:w-1/4 mt-4 md:mt-0">
-                    <h6 className="font-bold mb-2">Free Resources</h6>
-                    <p className="mb-4 text-sm">Use our HTML blocks for <strong>FREE</strong>.<br />
-                        <em>All are MIT License</em></p>
-                </div>
-                <div className="px-4 md:w-1/4 md:ml-auto mt-6 sm:mt-4 md:mt-0">
-                    <button className="px-4 py-2 bg-purple-800 hover:bg-purple-900 rounded text-white">Get Started</button>
-                </div>
+            <div className="container mx-auto md:py-4 mt-8 md:mt-0">
+                <ul className="list-none px-4">
+                    <li className="mb-2">
+                        <a href="#" className="text-coffee-300 hover:text-coffee-800">前往後臺</a>
+                    </li>
+                </ul>
             </div>
-        </div>
-    </footer>)
+            <div className="text-center bg-slate-400 py-1">Copyright © 2023
+                <a className="mx-1 border-b border-solid border-transparent hover:border-coffee-800 hover:text-coffee-800" href="https://github.com/cottongrass0828" target="_blank">
+                    cottongrass0828<FaGithub className="inline-block h-5 w-5 ml-1 mb-1" />
+                </a> 本網站僅供個人作品集製作，並無商業用途！</div>
+        </footer>)
 }
 export default Footer
